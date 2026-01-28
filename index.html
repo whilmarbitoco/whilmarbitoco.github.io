@@ -1,95 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <!-- Basic Meta Tags -->
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="description" content="Official developer portfolio of Whilmar Bitoco. This site is currently under construction. Get in touch to collaborate on web development, software engineering, and full-stack projects." />
-  <meta name="keywords" content="Whilmar Bitoco, web developer, software engineer, full-stack developer, JavaScript, React, Node.js, portfolio, programming, coding" />
-  <meta name="author" content="Whilmar Bitoco" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whilmar Bitoco | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        margin: 0;
+        background-color: #09090b;
+        color: white;
+        font-family: sans-serif;
+      }
+      canvas {
+        fixed: top 0;
+        left: 0;
+        outline: none;
+        z-index: -1;
+      }
+      .section {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        padding: 0 10%;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bg" class="fixed top-0 left-0 w-full h-full"></canvas>
 
-  <!-- Open Graph Meta Tags for Social Sharing -->
-  <meta property="og:title" content="Whilmar Bitoco | Developer Portfolio" />
-  <meta property="og:description" content="My portfolio is currently under construction. Contact me or check out my GitHub to learn more about my projects." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://github.com/whilmarbitoco" />
-  <meta property="og:image" content="https://github.com/whilmarbitoco.png" />
+    <nav class="fixed w-full p-8 flex justify-between items-center z-50 mix-blend-difference">
+      <h1 class="text-2xl font-bold tracking-tighter uppercase">wb2c0</h1>
+      <div class="space-x-8 text-sm uppercase tracking-widest">
+        <a href="#about" class="hover:opacity-50 transition">About</a>
+        <a href="#work" class="hover:opacity-50 transition">Work</a>
+      </div>
+    </nav>
 
-  <!-- Twitter Card Tags -->
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Whilmar Bitoco | Developer Portfolio" />
-  <meta name="twitter:description" content="This site is under construction. Visit my GitHub to explore my work and connect with me." />
-  <meta name="twitter:image" content="https://github.com/whilmarbitoco.png" />
+    <main class="relative z-10">
+      <section class="section">
+        <div class="max-w-2xl">
+          <h2 id="title" class="text-7xl md:text-9xl font-black uppercase leading-none opacity-0">
+            Creative <br />
+            <span class="text-blue-500">Engineer</span>
+          </h2>
+          <p class="mt-8 text-zinc-400 text-lg max-w-sm">
+            Crafting immersive digital experiences with modern web tech and spatial design.
+          </p>
+        </div>
+      </section>
 
-  <!-- Canonical Link -->
-  <link rel="canonical" href="https://github.com/whilmarbitoco" />
+      <section id="about" class="section justify-end">
+        <div class="max-w-md bg-white/5 backdrop-blur-lg p-10 rounded-2xl border border-white/10">
+          <h3 class="text-3xl font-bold mb-4">The Stack</h3>
+          <p class="text-zinc-300 leading-relaxed">
+            I use GSAP for high-performance orchestration and Three.js to push the boundaries of the
+            browser's 3D capabilities.
+          </p>
+        </div>
+      </section>
+    </main>
 
-  <!-- Favicon -->
-  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-  <!-- Title -->
-  <title>Whilmar Bitoco | Developer Portfolio (Under Construction)</title>
+    <script>
+      // --- THREE.JS SETUP ---
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        75,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      const renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector("#bg"),
+        antialias: true,
+        alpha: true,
+      });
 
-  <!-- Font and Styling -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      camera.position.setZ(30);
 
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background-color: #0f172a;
-      color: #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      flex-direction: column;
-      text-align: center;
-    }
+      // Add an object (Abstract Wireframe Sphere)
+      const geometry = new THREE.IcosahedronGeometry(10, 1);
+      const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
+      const sphere = new THREE.Mesh(geometry, material);
+      scene.add(sphere);
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 0.5rem;
-    }
+      // --- GSAP ANIMATIONS ---
+      gsap.registerPlugin(ScrollTrigger);
 
-    p {
-      font-size: 1.2rem;
-      max-width: 600px;
-      margin-bottom: 1.5rem;
-    }
+      // Hero Reveal
+      gsap.to("#title", { opacity: 1, y: -20, duration: 1.5, ease: "power4.out", delay: 0.5 });
 
-    a {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      font-size: 1rem;
-      background-color: #3b82f6;
-      color: white;
-      text-decoration: none;
-      border-radius: 0.5rem;
-      transition: background-color 0.3s ease;
-      margin: 0.25rem;
-    }
+      // Scroll Animation: Rotate and move sphere
+      gsap.to(sphere.rotation, {
+        y: Math.PI * 2,
+        x: Math.PI,
+        scrollTrigger: {
+          trigger: "main",
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 2,
+        },
+      });
 
-    a:hover {
-      background-color: #2563eb;
-    }
+      gsap.to(sphere.position, {
+        x: 15,
+        scrollTrigger: {
+          trigger: "#about",
+          start: "top bottom",
+          end: "top center",
+          scrub: 1,
+        },
+      });
 
-    .emoji {
-      font-size: 2rem;
-    }
-  </style>
-</head>
-<body>
-  <div>
-    <div class="emoji">🚧</div>
-    <h1>Page Under Construction</h1>
-    <p>Hello, I'm <strong>Whilmar Bitoco</strong>, a passionate developer. My portfolio is being built, but you can still get in touch or see my work below.</p>
-    <a href="mailto:whlmrbitoco@gmail.com">📨 Contact Me</a>
-    <a href="https://github.com/whilmarbitoco" target="_blank" rel="noopener noreferrer">💻 Visit GitHub</a>
-  </div>
-</body>
+      // --- RENDER LOOP ---
+      function animate() {
+        requestAnimationFrame(animate);
+        sphere.rotation.z += 0.001; // subtle constant spin
+        renderer.render(scene, camera);
+      }
+
+      // Handle Resize
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      animate();
+    </script>
+  </body>
 </html>
