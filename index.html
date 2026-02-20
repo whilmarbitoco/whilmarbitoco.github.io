@@ -3,136 +3,1938 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Whilmar Bitoco | Portfolio</title>
+    <title>Ubuntu Web OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
     <style>
+      :root {
+        /* Yaru Light (Default) */
+        --ubuntu-orange: #e95420;
+        --ubuntu-aubergine: #77216f;
+        --ubuntu-dark: #333333;
+        --panel-bg: rgba(25, 25, 25, 0.95);
+        --panel-text: #f4f4f4;
+        --dock-bg: rgba(25, 25, 25, 0.85);
+        --window-bg: #fafafa;
+        --window-header: #ebebeb;
+        --window-text: #333333;
+        --window-border: rgba(0, 0, 0, 0.2);
+        --accent-color: #e95420;
+        --wallpaper: url("./images/light.jpg");
+      }
+
+      .dark-mode {
+        /* Yaru Dark */
+        --window-bg: #2d2d2d;
+        --window-header: #202020;
+        --window-text: #f4f4f4;
+        --window-border: rgba(255, 255, 255, 0.1);
+      }
+
+      * {
+        box-sizing: border-box;
+        user-select: none;
+        font-family:
+          "Ubuntu",
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          Oxygen,
+          Cantarell,
+          "Open Sans",
+          "Helvetica Neue",
+          sans-serif;
+      }
+
       body {
         margin: 0;
-        background-color: #09090b;
-        color: white;
-        font-family: sans-serif;
+        overflow: hidden;
+        background: #000;
+        height: 100vh;
+        width: 100vw;
       }
-      canvas {
-        fixed: top 0;
+
+      /* --- Boot Sequence --- */
+      #boot-screen {
+        position: absolute;
+        top: 0;
         left: 0;
-        outline: none;
+        right: 0;
+        bottom: 0;
+        background: #000;
+        color: #ccc;
+        font-family: monospace;
+        z-index: 9999;
+        padding: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: opacity 1s ease-out;
+      }
+      .log-line {
+        margin: 2px 0;
+        font-size: 14px;
+        animation: fadeIn 0.1s ease-in;
+      }
+      .log-ok {
+        color: #4caf50;
+        font-weight: bold;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* --- Login Screen --- */
+      #login-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--wallpaper) center/cover;
+        z-index: 9998;
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition:
+          opacity 1s ease-in-out,
+          transform 0.5s ease-out;
+      }
+      #login-screen::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
         z-index: -1;
       }
-      .section {
-        height: 100vh;
+      .avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: #444;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
-        padding: 0 10%;
+        justify-content: center;
+        font-size: 50px;
+        color: #fff;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      }
+      .login-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 5px;
+        width: 250px;
+        text-align: center;
+        outline: none;
+        transition: all 0.2s;
+      }
+      .login-input:focus {
+        border-color: var(--ubuntu-orange);
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* --- Desktop --- */
+      #desktop {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--wallpaper) center/cover;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.5s ease-in;
+        overflow: hidden;
+      }
+
+      /* --- Top Panel --- */
+      #top-panel {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 28px;
+        background: var(--panel-bg);
+        color: var(--panel-text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        font-size: 14px;
+        z-index: 9000;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
+      .panel-btn {
+        padding: 0 10px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-radius: 4px;
+        margin: 0 2px;
+      }
+      .panel-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+      }
+      .panel-center {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        font-weight: bold;
+      }
+
+      /* --- Dock --- */
+      #dock {
+        position: absolute;
+        top: 28px;
+        left: 0;
+        bottom: 0;
+        width: 54px;
+        background: var(--dock-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 10px;
+        z-index: 8900;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+      }
+      .dock-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        cursor: pointer;
+        transition:
+          transform 0.2s,
+          background 0.2s;
+        position: relative;
+      }
+      .dock-icon:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.05);
+      }
+      .dock-icon.running::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 4px;
+        background: var(--ubuntu-orange);
+        border-radius: 50%;
+      }
+      .dock-icon.active::after {
+        height: 12px;
+        border-radius: 2px;
+      }
+
+      /* --- Workspace --- */
+      #workspace {
+        position: absolute;
+        top: 28px;
+        left: 54px;
+        right: 0;
+        bottom: 0;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* --- Windows --- */
+      .window {
+        position: absolute;
+        width: 600px;
+        height: 400px;
+        background: var(--window-bg);
+        color: var(--window-text);
+        border-radius: 8px;
+        box-shadow:
+          0 10px 30px rgba(0, 0, 0, 0.4),
+          0 0 0 1px var(--window-border);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: windowOpen 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: box-shadow 0.2s;
+      }
+      .window.maximized {
+        border-radius: 0;
+      }
+      .window.snapped {
+        transition: all 0.2s;
+      }
+      .window.focused {
+        box-shadow:
+          0 15px 40px rgba(0, 0, 0, 0.5),
+          0 0 0 1px var(--accent-color);
+      }
+
+      @keyframes windowOpen {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      @keyframes windowClose {
+        from {
+          opacity: 1;
+          transform: scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+      }
+
+      .titlebar {
+        height: 38px;
+        background: var(--window-header);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 10px;
+        cursor: default;
+        border-bottom: 1px solid var(--window-border);
+      }
+      .titlebar-title {
+        font-weight: bold;
+        font-size: 14px;
+        pointer-events: none;
+      }
+      .window-controls {
+        display: flex;
+        gap: 8px;
+      }
+      .win-btn {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: transparent;
+        transition: background 0.1s;
+      }
+      .win-btn:hover {
+        color: rgba(0, 0, 0, 0.6);
+      }
+      .dark-mode .win-btn:hover {
+        color: rgba(255, 255, 255, 0.6);
+      }
+      .btn-close {
+        background: #e95420;
+      }
+      .btn-close:hover {
+        background: #ff6b3b;
+      }
+      .btn-min,
+      .btn-max {
+        background: #888;
+      }
+      .btn-min:hover,
+      .btn-max:hover {
+        background: #aaa;
+      }
+
+      .window-content {
+        flex: 1;
+        position: relative;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+      .resize-handle {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 15px;
+        height: 15px;
+        cursor: nwse-resize;
+      }
+
+      /* --- Activities Overview --- */
+      #activities-overview {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(15px);
+        z-index: 8000;
+        display: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        padding: 50px;
+        flex-direction: column;
+        align-items: center;
+      }
+      .overview-search {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 10px 20px;
+        color: white;
+        width: 400px;
+        outline: none;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+      .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 30px;
+        width: 80%;
+        max-width: 1000px;
+      }
+      .app-shortcut {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+      .app-shortcut:hover {
+        transform: scale(1.1);
+      }
+      .app-shortcut i {
+        font-size: 48px;
+        margin-bottom: 10px;
+        text-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      }
+
+      /* --- Alt Tab Overlay --- */
+      #alt-tab-overlay {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(30, 30, 30, 0.9);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        padding: 20px;
+        display: none;
+        gap: 15px;
+        z-index: 9999;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .alt-tab-item {
+        width: 150px;
+        height: 120px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: 2px solid transparent;
+      }
+      .alt-tab-item.selected {
+        border-color: var(--ubuntu-orange);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      /* --- Apps Specific Styles --- */
+      /* Terminal */
+      .term-bg {
+        background: #300a24;
+        color: #fff;
+        font-family: monospace;
+        padding: 10px;
+        overflow-y: auto;
+        height: 100%;
+        font-size: 14px;
+        user-select: text;
+      }
+      .term-input-line {
+        display: flex;
+      }
+      .term-prompt {
+        color: #8ae234;
+        margin-right: 8px;
+        white-space: pre;
+      }
+      .term-dir {
+        color: #729fcf;
+      }
+      .term-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: #fff;
+        outline: none;
+        font-family: monospace;
+      }
+
+      /* Files */
+      .files-sidebar {
+        width: 150px;
+        background: var(--window-header);
+        border-right: 1px solid var(--window-border);
+        display: flex;
+        flex-direction: column;
+        padding: 10px 0;
+      }
+      .files-nav-item {
+        padding: 8px 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        transition: background 0.1s;
+      }
+      .files-nav-item:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+      .dark-mode .files-nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .files-main {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+        gap: 15px;
+        overflow-y: auto;
+      }
+      .file-item {
+        width: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        font-size: 12px;
+        cursor: pointer;
+        padding: 10px 5px;
+        border-radius: 5px;
+      }
+      .file-item:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+      .dark-mode .file-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .file-item i {
+        font-size: 32px;
+        margin-bottom: 5px;
+        color: var(--ubuntu-orange);
+      }
+      .file-item i.fa-file-lines {
+        color: #888;
+      }
+
+      /* Text Editor */
+      .editor-textarea {
+        width: 100%;
+        height: 100%;
+        resize: none;
+        border: none;
+        outline: none;
+        padding: 10px;
+        background: var(--window-bg);
+        color: var(--window-text);
+        font-family: monospace;
+        font-size: 14px;
+      }
+
+      /* Settings */
+      .settings-sidebar {
+        width: 200px;
+        background: var(--window-header);
+        border-right: 1px solid var(--window-border);
+      }
+      .settings-content {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+      }
+      .setting-group {
+        margin-bottom: 30px;
+      }
+      .setting-group h3 {
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--window-border);
+      }
+      .toggle-btn {
+        padding: 8px 16px;
+        background: var(--window-header);
+        border: 1px solid var(--window-border);
+        border-radius: 4px;
+        cursor: pointer;
+        color: var(--window-text);
+      }
+      .toggle-btn.active {
+        background: var(--accent-color);
+        color: white;
+        border-color: var(--accent-color);
+      }
+      .color-picker {
+        display: flex;
+        gap: 10px;
+      }
+      .color-swatch {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid transparent;
+      }
+      .color-swatch.active {
+        border-color: var(--window-text);
+      }
+
+      /* Software Center */
+      .software-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+      .software-card {
+        border: 1px solid var(--window-border);
+        border-radius: 8px;
+        padding: 15px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .dark-mode .software-card {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .software-icon {
+        font-size: 40px;
+        color: var(--accent-color);
+        width: 50px;
+        text-align: center;
+      }
+      .software-info {
+        flex: 1;
+      }
+      .software-btn {
+        padding: 5px 15px;
+        border-radius: 15px;
+        border: none;
+        background: var(--accent-color);
+        color: white;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .software-btn.installed {
+        background: #e0e0e0;
+        color: #555;
+      }
+      .dark-mode .software-btn.installed {
+        background: #444;
+        color: #aaa;
+      }
+
+      /* System Monitor */
+      .monitor-graph {
+        height: 150px;
+        border: 1px solid var(--window-border);
+        margin-bottom: 20px;
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.02);
+      }
+      .dark-mode .monitor-graph {
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .graph-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        stroke: var(--ubuntu-orange);
+        stroke-width: 2;
+        fill: rgba(233, 84, 32, 0.2);
+      }
+
+      /* Easter Egg / System Info */
+      .neofetch-art {
+        color: var(--ubuntu-orange);
+        font-weight: bold;
+        margin-right: 20px;
+        float: left;
+        white-space: pre;
       }
     </style>
   </head>
   <body>
-    <canvas id="bg" class="fixed top-0 left-0 w-full h-full"></canvas>
+    <!-- Boot Sequence -->
+    <div id="boot-screen"></div>
 
-    <nav class="fixed w-full p-8 flex justify-between items-center z-50 mix-blend-difference">
-      <h1 class="text-2xl font-bold tracking-tighter uppercase">wb2c0</h1>
-      <div class="space-x-8 text-sm uppercase tracking-widest">
-        <a href="#about" class="hover:opacity-50 transition">About</a>
-        <a href="#work" class="hover:opacity-50 transition">Work</a>
+    <!-- Login Screen -->
+    <div id="login-screen">
+      <div class="avatar"><i class="fas fa-user"></i></div>
+      <h2 class="text-white text-2xl font-bold mb-6 drop-shadow-md">wb2c0</h2>
+      <input type="password" id="login-pwd" class="login-input" placeholder="Password" autofocus />
+      <p class="text-gray-300 text-sm mt-4 opacity-70">Press Enter to login (any password works)</p>
+    </div>
+
+    <!-- Desktop Environment -->
+    <div id="desktop">
+      <!-- Top Panel -->
+      <div id="top-panel">
+        <div class="panel-btn" onclick="Shell.toggleActivities()">Activities</div>
+        <div class="panel-center panel-btn" id="clock">Fri 12:00 PM</div>
+        <div class="flex h-full">
+          <div class="panel-btn"><i class="fas fa-network-wired"></i></div>
+          <div class="panel-btn"><i class="fas fa-volume-up"></i></div>
+          <div class="panel-btn"><i class="fas fa-battery-three-quarters"></i></div>
+          <div class="panel-btn" onclick="Shell.lockScreen()"><i class="fas fa-power-off"></i></div>
+        </div>
       </div>
-    </nav>
 
-    <main class="relative z-10">
-      <section class="section">
-        <div class="max-w-2xl">
-          <h2 id="title" class="text-7xl md:text-9xl font-black uppercase leading-none opacity-0">
-            Creative <br />
-            <span class="text-blue-500">Engineer</span>
-          </h2>
-          <p class="mt-8 text-zinc-400 text-lg max-w-sm">
-            Crafting immersive digital experiences with modern web tech and spatial design.
-          </p>
+      <!-- Left Dock -->
+      <div id="dock">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- Window Workspace -->
+      <div id="workspace"></div>
+
+      <!-- Activities Overview -->
+      <div id="activities-overview">
+        <input type="text" class="overview-search" placeholder="Type to search..." />
+        <div class="overview-grid" id="app-launcher-grid">
+          <!-- Populated by JS -->
         </div>
-      </section>
+      </div>
 
-      <section id="about" class="section justify-end">
-        <div class="max-w-md bg-white/5 backdrop-blur-lg p-10 rounded-2xl border border-white/10">
-          <h3 class="text-3xl font-bold mb-4">The Stack</h3>
-          <p class="text-zinc-300 leading-relaxed">
-            I use GSAP for high-performance orchestration and Three.js to push the boundaries of the
-            browser's 3D capabilities.
-          </p>
-        </div>
-      </section>
-    </main>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+      <!-- Alt+Tab Overlay -->
+      <div id="alt-tab-overlay"></div>
+    </div>
 
     <script>
-      // --- THREE.JS SETUP ---
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(
-        75,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000,
-      );
-      const renderer = new THREE.WebGLRenderer({
-        canvas: document.querySelector("#bg"),
-        antialias: true,
-        alpha: true,
-      });
+      // --- Core System Data & State ---
+      const State = {
+        user: "user",
+        hostname: "ubuntu",
+        theme: "light",
+        accent: "#E95420",
+        wallpaper: "./images/dark.jpg",
+        windows: [],
+        activeWindowId: null,
+        installedPackages: ["coreutils", "apt", "python3", "nano"],
+        devMode: false,
+      };
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(window.devicePixelRatio);
-      camera.position.setZ(30);
-
-      // Add an object (Abstract Wireframe Sphere)
-      const geometry = new THREE.IcosahedronGeometry(10, 1);
-      const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
-      const sphere = new THREE.Mesh(geometry, material);
-      scene.add(sphere);
-
-      // --- GSAP ANIMATIONS ---
-      gsap.registerPlugin(ScrollTrigger);
-
-      // Hero Reveal
-      gsap.to("#title", { opacity: 1, y: -20, duration: 1.5, ease: "power4.out", delay: 0.5 });
-
-      // Scroll Animation: Rotate and move sphere
-      gsap.to(sphere.rotation, {
-        y: Math.PI * 2,
-        x: Math.PI,
-        scrollTrigger: {
-          trigger: "main",
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 2,
+      // Virtual Filesystem
+      const VFS = {
+        "/": {
+          bin: {},
+          boot: {},
+          dev: {},
+          etc: { "os-release": 'NAME="Ubuntu"\nVERSION="22.04 LTS (Jammy Jellyfish)"' },
+          home: {
+            user: {
+              Desktop: {},
+              Documents: {
+                "notes.txt":
+                  "Welcome to Ubuntu Web OS.\n\nTry the Konami code:\nUp Up Down Down Left Right Left Right B A",
+              },
+              Downloads: {},
+              Pictures: {},
+              Music: {},
+            },
+          },
+          root: {},
+          usr: {},
+          var: {},
         },
-      });
+      };
 
-      gsap.to(sphere.position, {
-        x: 15,
-        scrollTrigger: {
-          trigger: "#about",
-          start: "top bottom",
-          end: "top center",
-          scrub: 1,
+      // App Definitions
+      const Apps = {
+        terminal: {
+          id: "terminal",
+          name: "Terminal",
+          icon: "fas fa-terminal",
+          color: "#333",
+          bg: "#fff",
         },
-      });
+        files: { id: "files", name: "Files", icon: "fas fa-folder", color: "#E95420", bg: "#fff" },
+        software: {
+          id: "software",
+          name: "Software",
+          icon: "fas fa-shopping-bag",
+          color: "#00A1A1",
+          bg: "#fff",
+        },
+        editor: {
+          id: "editor",
+          name: "Text Editor",
+          icon: "fas fa-file-alt",
+          color: "#77216F",
+          bg: "#fff",
+        },
+        settings: {
+          id: "settings",
+          name: "Settings",
+          icon: "fas fa-cog",
+          color: "#555",
+          bg: "#fff",
+        },
+        monitor: {
+          id: "monitor",
+          name: "System Monitor",
+          icon: "fas fa-chart-line",
+          color: "#38bdf8",
+          bg: "#fff",
+        },
+      };
 
-      // --- RENDER LOOP ---
-      function animate() {
-        requestAnimationFrame(animate);
-        sphere.rotation.z += 0.001; // subtle constant spin
-        renderer.render(scene, camera);
+      const DockApps = ["terminal", "files", "software", "editor", "settings"];
+
+      // --- Helpers ---
+      const getEl = (id) => document.getElementById(id);
+      const uuid = () => Math.random().toString(36).substr(2, 9);
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      // File System Helpers
+      function getVFSNode(path) {
+        let parts = path.split("/").filter((p) => p);
+        let current = VFS["/"];
+        for (let p of parts) {
+          if (!current[p]) return null;
+          current = current[p];
+        }
+        return current;
+      }
+      function resolvePath(pwd, target) {
+        if (target.startsWith("/")) return target;
+        if (target === "~") return "/home/" + State.user;
+        let parts = pwd.split("/").filter((p) => p);
+        let targetParts = target.split("/").filter((p) => p);
+        for (let p of targetParts) {
+          if (p === ".") continue;
+          if (p === "..") parts.pop();
+          else parts.push(p);
+        }
+        return "/" + parts.join("/");
       }
 
-      // Handle Resize
-      window.addEventListener("resize", () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      // --- Window Manager ---
+      class WindowManager {
+        constructor() {
+          this.workspace = getEl("workspace");
+          this.zIndexCounter = 100;
+          this.isDragging = false;
+          this.isResizing = false;
+          this.dragInfo = {};
+        }
+
+        open(appId, initialArgs = null) {
+          const app = Apps[appId];
+          if (!app) return;
+
+          const winId = "win-" + uuid();
+          const winEl = document.createElement("div");
+          winEl.className = "window focused";
+          winEl.id = winId;
+
+          // Starting position (staggered)
+          const offset = (State.windows.length % 5) * 30;
+          winEl.style.left = 100 + offset + "px";
+          winEl.style.top = 50 + offset + "px";
+          winEl.style.zIndex = ++this.zIndexCounter;
+
+          winEl.innerHTML = `
+                    <div class="titlebar">
+                        <div class="titlebar-title">${app.name}</div>
+                        <div class="window-controls">
+                            <button class="win-btn btn-min" onclick="WM.minimize('${winId}')"><i class="fas fa-minus"></i></button>
+                            <button class="win-btn btn-max" onclick="WM.maximize('${winId}')"><i class="fas fa-square"></i></button>
+                            <button class="win-btn btn-close" onclick="WM.close('${winId}')"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="window-content" id="content-${winId}"></div>
+                    <div class="resize-handle"></div>
+                `;
+
+          this.workspace.appendChild(winEl);
+
+          const winObj = { id: winId, appId: appId, el: winEl, minimized: false, maximized: false };
+          State.windows.push(winObj);
+          this.focus(winId);
+
+          // Setup drag
+          const titlebar = winEl.querySelector(".titlebar");
+          titlebar.addEventListener("mousedown", (e) => this.startDrag(e, winId));
+
+          // Setup resize
+          const resizeHandle = winEl.querySelector(".resize-handle");
+          resizeHandle.addEventListener("mousedown", (e) => this.startResize(e, winId));
+
+          winEl.addEventListener("mousedown", () => this.focus(winId));
+
+          // Render content
+          this.renderAppContent(appId, winId, initialArgs);
+          Shell.updateDock();
+        }
+
+        close(winId) {
+          const win = State.windows.find((w) => w.id === winId);
+          if (!win) return;
+          win.el.style.animation =
+            "windowClose 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards";
+          setTimeout(() => {
+            win.el.remove();
+            State.windows = State.windows.filter((w) => w.id !== winId);
+            if (State.activeWindowId === winId) State.activeWindowId = null;
+            if (State.windows.length > 0) this.focus(State.windows[State.windows.length - 1].id);
+            Shell.updateDock();
+          }, 200);
+        }
+
+        maximize(winId) {
+          const win = State.windows.find((w) => w.id === winId);
+          if (!win) return;
+          if (win.maximized) {
+            win.el.style.width = win.prevRect.w;
+            win.el.style.height = win.prevRect.h;
+            win.el.style.left = win.prevRect.x;
+            win.el.style.top = win.prevRect.y;
+            win.el.classList.remove("maximized", "snapped");
+            win.maximized = false;
+          } else {
+            win.prevRect = {
+              w: win.el.style.width,
+              h: win.el.style.height,
+              x: win.el.style.left,
+              y: win.el.style.top,
+            };
+            win.el.style.width = "100%";
+            win.el.style.height = "100%";
+            win.el.style.left = "0";
+            win.el.style.top = "0";
+            win.el.classList.add("maximized");
+            win.maximized = true;
+          }
+        }
+
+        minimize(winId) {
+          const win = State.windows.find((w) => w.id === winId);
+          if (!win) return;
+          win.el.style.display = "none";
+          win.minimized = true;
+          if (State.activeWindowId === winId) State.activeWindowId = null;
+        }
+
+        unminimize(winId) {
+          const win = State.windows.find((w) => w.id === winId);
+          if (!win) return;
+          win.el.style.display = "flex";
+          win.minimized = false;
+          this.focus(winId);
+        }
+
+        focus(winId) {
+          State.windows.forEach((w) => w.el.classList.remove("focused"));
+          const win = State.windows.find((w) => w.id === winId);
+          if (win) {
+            win.el.style.zIndex = ++this.zIndexCounter;
+            win.el.classList.add("focused");
+            State.activeWindowId = winId;
+            if (win.minimized) this.unminimize(winId);
+          }
+          Shell.updateDock();
+        }
+
+        startDrag(e, winId) {
+          if (e.target.closest(".window-controls")) return;
+          const win = State.windows.find((w) => w.id === winId);
+          if (win.maximized) return; // Don't drag maximized
+          this.isDragging = true;
+          this.focus(winId);
+
+          const rect = win.el.getBoundingClientRect();
+          this.dragInfo = {
+            winId,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top,
+            winEl: win.el,
+          };
+
+          win.el.classList.remove("snapped");
+          win.el.style.transition = "none"; // Disable transition during drag
+        }
+
+        startResize(e, winId) {
+          this.isResizing = true;
+          this.focus(winId);
+          const win = State.windows.find((w) => w.id === winId);
+          const rect = win.el.getBoundingClientRect();
+          this.dragInfo = {
+            winId,
+            winEl: win.el,
+            startX: e.clientX,
+            startY: e.clientY,
+            startW: rect.width,
+            startH: rect.height,
+          };
+          win.el.style.transition = "none";
+          e.stopPropagation();
+        }
+
+        handleMouseMove(e) {
+          if (this.isDragging) {
+            const { winEl, offsetX, offsetY } = this.dragInfo;
+            let x = e.clientX - offsetX;
+            let y = e.clientY - offsetY;
+
+            // Boundary checks (basic)
+            if (y < 0) y = 0;
+
+            // Edge Snap Preview logic could go here (omitted for brevity, implementing direct snap on drop)
+            winEl.style.left = x + "px";
+            winEl.style.top = y + "px";
+          } else if (this.isResizing) {
+            const { winEl, startX, startY, startW, startH } = this.dragInfo;
+            let newW = startW + (e.clientX - startX);
+            let newH = startH + (e.clientY - startY);
+            if (newW > 200) winEl.style.width = newW + "px";
+            if (newH > 100) winEl.style.height = newH + "px";
+          }
+        }
+
+        handleMouseUp(e) {
+          if (this.isDragging) {
+            const { winEl, winId } = this.dragInfo;
+            winEl.style.transition = "box-shadow 0.2s";
+
+            // Simple Snapping logic
+            if (e.clientY <= 5) {
+              this.maximize(winId); // Snap to top
+            } else if (e.clientX <= 5) {
+              // Snap left
+              winEl.classList.add("snapped");
+              winEl.style.left = "0";
+              winEl.style.top = "0";
+              winEl.style.width = "50%";
+              winEl.style.height = "100%";
+            } else if (e.clientX >= window.innerWidth - 5) {
+              // Snap right
+              winEl.classList.add("snapped");
+              winEl.style.left = "50%";
+              winEl.style.top = "0";
+              winEl.style.width = "50%";
+              winEl.style.height = "100%";
+            }
+          }
+          if (this.isResizing) {
+            this.dragInfo.winEl.style.transition = "box-shadow 0.2s";
+          }
+          this.isDragging = false;
+          this.isResizing = false;
+        }
+
+        renderAppContent(appId, winId, args) {
+          const container = getEl(`content-${winId}`);
+          switch (appId) {
+            case "terminal":
+              new TerminalApp(container, winId);
+              break;
+            case "files":
+              new FilesApp(container, winId, args);
+              break;
+            case "editor":
+              new EditorApp(container, winId, args);
+              break;
+            case "settings":
+              new SettingsApp(container, winId);
+              break;
+            case "software":
+              new SoftwareApp(container, winId);
+              break;
+            case "monitor":
+              new MonitorApp(container, winId);
+              break;
+          }
+        }
+      }
+
+      const WM = new WindowManager();
+      document.addEventListener("mousemove", (e) => WM.handleMouseMove(e));
+      document.addEventListener("mouseup", (e) => WM.handleMouseUp(e));
+
+      // --- Application Logic ---
+
+      class TerminalApp {
+        constructor(container, winId) {
+          this.container = container;
+          this.pwd = "/home/" + State.user;
+          this.history = [];
+          this.historyIndex = -1;
+          this.render();
+        }
+
+        render() {
+          this.container.innerHTML = `
+                    <div class="term-bg" id="term-out-${this.container.id}" onclick="document.getElementById('term-in-${this.container.id}').focus()">
+                        <div>Welcome to Ubuntu 22.04 LTS (GNU/Linux 5.15.0-generic x86_64)</div><br>
+                        <div> * Documentation:  https://help.ubuntu.com</div>
+                        <div> * Management:     https://landscape.canonical.com</div>
+                        <div> * Support:        https://ubuntu.com/advantage</div><br>
+                        <div id="term-lines-${this.container.id}"></div>
+                        <div class="term-input-line">
+                            <span class="term-prompt">${State.user}@${State.hostname}:<span class="term-dir">${this.getShortPwd()}</span>$ </span>
+                            <input type="text" class="term-input" id="term-in-${this.container.id}" autocomplete="off" spellcheck="false">
+                        </div>
+                    </div>
+                `;
+          const input = getEl(`term-in-${this.container.id}`);
+          input.addEventListener("keydown", (e) => this.handleInput(e));
+          setTimeout(() => input.focus(), 100);
+        }
+
+        getShortPwd() {
+          return this.pwd.startsWith("/home/" + State.user)
+            ? "~" + this.pwd.substring("/home/wb2c0".length)
+            : this.pwd;
+        }
+
+        print(html) {
+          const lines = getEl(`term-lines-${this.container.id}`);
+          lines.innerHTML += `<div>${html}</div>`;
+          getEl(`term-out-${this.container.id}`).scrollTop = 99999;
+        }
+
+        handleInput(e) {
+          if (e.key === "Enter") {
+            const val = e.target.value;
+            e.target.value = "";
+            if (val) {
+              this.history.push(val);
+              this.historyIndex = this.history.length;
+            }
+            this.print(
+              `<span class="term-prompt">${State.user}@${State.hostname}:<span class="term-dir">${this.getShortPwd()}</span>$ </span>${val}`,
+            );
+            this.execute(val);
+
+            // Update prompt dir
+            const prompt = this.container.querySelector(".term-input-line");
+            prompt.querySelector(".term-dir").innerText = this.getShortPwd();
+            getEl(`term-out-${this.container.id}`).scrollTop = 99999;
+          } else if (e.key === "ArrowUp") {
+            if (this.historyIndex > 0) {
+              this.historyIndex--;
+              e.target.value = this.history[this.historyIndex];
+            }
+          } else if (e.key === "ArrowDown") {
+            if (this.historyIndex < this.history.length - 1) {
+              this.historyIndex++;
+              e.target.value = this.history[this.historyIndex];
+            } else {
+              this.historyIndex = this.history.length;
+              e.target.value = "";
+            }
+          }
+        }
+
+        execute(cmdLine) {
+          if (!cmdLine.trim()) return;
+          let args = cmdLine.trim().split(/\s+/);
+          let cmd = args.shift();
+
+          switch (cmd) {
+            case "ls":
+              let target = args[0] ? resolvePath(this.pwd, args[0]) : this.pwd;
+              let node = getVFSNode(target);
+              if (!node) this.print(`ls: cannot access '${target}': No such file or directory`);
+              else if (typeof node === "string") this.print(target);
+              else {
+                let out = Object.keys(node)
+                  .map((k) => {
+                    return typeof node[k] === "object"
+                      ? `<span style="color:#729FCF;font-weight:bold">${k}</span>`
+                      : k;
+                  })
+                  .join("  ");
+                this.print(out);
+              }
+              break;
+            case "cd":
+              let newDir = args[0] || "/home/" + State.user;
+              let fullPath = resolvePath(this.pwd, newDir);
+              let destNode = getVFSNode(fullPath);
+              if (!destNode) this.print(`cd: ${newDir}: No such file or directory`);
+              else if (typeof destNode === "string") this.print(`cd: ${newDir}: Not a directory`);
+              else this.pwd = fullPath;
+              break;
+            case "pwd":
+              this.print(this.pwd);
+              break;
+            case "cat":
+              if (!args[0]) {
+                this.print("cat: missing operand");
+                break;
+              }
+              let fPath = resolvePath(this.pwd, args[0]);
+              let fNode = getVFSNode(fPath);
+              if (!fNode) this.print(`cat: ${args[0]}: No such file or directory`);
+              else if (typeof fNode === "object") this.print(`cat: ${args[0]}: Is a directory`);
+              else this.print(fNode.replace(/\n/g, "<br>"));
+              break;
+            case "mkdir":
+              if (!args[0]) {
+                this.print("mkdir: missing operand");
+                break;
+              }
+              let mPath = resolvePath(this.pwd, args[0]);
+              let mParentPath = mPath.substring(0, mPath.lastIndexOf("/")) || "/";
+              let mName = mPath.substring(mPath.lastIndexOf("/") + 1);
+              let mParent = getVFSNode(mParentPath);
+              if (!mParent)
+                this.print(
+                  `mkdir: cannot create directory '${args[0]}': No such file or directory`,
+                );
+              else if (mParent[mName])
+                this.print(`mkdir: cannot create directory '${args[0]}': File exists`);
+              else mParent[mName] = {};
+              break;
+            case "touch":
+              if (!args[0]) {
+                this.print("touch: missing file operand");
+                break;
+              }
+              let tPath = resolvePath(this.pwd, args[0]);
+              let tParentPath = tPath.substring(0, tPath.lastIndexOf("/")) || "/";
+              let tName = tPath.substring(tPath.lastIndexOf("/") + 1);
+              let tParent = getVFSNode(tParentPath);
+              if (tParent) tParent[tName] = "";
+              break;
+            case "rm":
+              if (!args[0]) {
+                this.print("rm: missing operand");
+                break;
+              }
+              let rPath = resolvePath(this.pwd, args[0]);
+              let rParentPath = rPath.substring(0, rPath.lastIndexOf("/")) || "/";
+              let rName = rPath.substring(rPath.lastIndexOf("/") + 1);
+              let rParent = getVFSNode(rParentPath);
+              if (rParent && rParent[rName]) delete rParent[rName];
+              else this.print(`rm: cannot remove '${args[0]}': No such file or directory`);
+              break;
+            case "clear":
+              getEl(`term-lines-${this.container.id}`).innerHTML = "";
+              break;
+            case "neofetch":
+              this.print(`
+<div style="display:flex">
+<div class="neofetch-art">
+            .-/+oossssoo+/-.               
+        \`:+ssssssssssssssssss+:\`           
+      -+ssssssssssssssssssyyssss+-         
+    .ossssssssssssssssssdMMMNysssso.       
+   /ssssssssssshdmmNNmmyNMMMMhssssss/      
+  +ssssssssshmydMMMMMMMNddddyssssssss+     
+ /sssssssshNMMMyhhyyyyhmNMMMNhssssssss/    
+.ssssssssdMMMNhsssssssssshNMMMdssssssss.   
++sssshhhyNMMNyssssssssssssyNMMMysssssss+   
+ossyNMMMNyMMhsssssssssssssshmmmhssssssso   
+ossyNMMMNyMMhsssssssssssssshmmmhssssssso   
++sssshhhyNMMNyssssssssssssyNMMMysssssss+   
+.ssssssssdMMMNhsssssssssshNMMMdssssssss.   
+ /sssssssshNMMMyhhyyyyhdNMMMNhssssssss/    
+  +sssssssssdmydMMMMMMMMddddyssssssss+     
+   /ssssssssssshdmNNNNmyNMMMMhssssss/      
+    .ossssssssssssssssssdMMMNysssso.       
+      -+sssssssssssssssssyyyssss+-         
+        \`:+ssssssssssssssssss+:\`           
+            .-/+oossssoo+/-.               
+</div>
+<div>
+<span style="color:var(--ubuntu-orange);font-weight:bold">${State.user}@${State.hostname}</span>
+-------------------
+<span style="color:var(--ubuntu-orange);font-weight:bold">OS</span>: Ubuntu Web OS 22.04 LTS x86_64
+<span style="color:var(--ubuntu-orange);font-weight:bold">Host</span>: Web Browser
+<span style="color:var(--ubuntu-orange);font-weight:bold">Kernel</span>: 5.15.0-generic (Web)
+<span style="color:var(--ubuntu-orange);font-weight:bold">Uptime</span>: ${Math.floor(performance.now() / 60000)} mins
+<span style="color:var(--ubuntu-orange);font-weight:bold">Packages</span>: ${State.installedPackages.length} (apt)
+<span style="color:var(--ubuntu-orange);font-weight:bold">Shell</span>: bash 5.1.16
+<span style="color:var(--ubuntu-orange);font-weight:bold">DE</span>: GNOME/Unity Web
+<span style="color:var(--ubuntu-orange);font-weight:bold">WM</span>: WebWM
+<span style="color:var(--ubuntu-orange);font-weight:bold">Theme</span>: Yaru-${State.theme} [GTK3]
+<span style="color:var(--ubuntu-orange);font-weight:bold">Terminal</span>: JS-Term
+<div style="margin-top:10px">
+  <span style="display:inline-block;width:15px;height:15px;background:#333"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#E95420"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#8AE234"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#FCE94F"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#729FCF"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#AD7FA8"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#34E2E2"></span>
+  <span style="display:inline-block;width:15px;height:15px;background:#EEEEEE"></span>
+</div>
+</div>
+</div>`);
+              break;
+            case "python":
+            case "python3":
+              let code = args.join(" ");
+              if (!code) {
+                this.print(
+                  "Python 3.10.4 (web-simulated)\nType 'exit()' to drop out (not really, just pass args).",
+                );
+                break;
+              }
+              try {
+                let res = eval(code);
+                this.print(res !== undefined ? String(res) : "");
+              } catch (e) {
+                this.print(`<span style="color:red">${e}</span>`);
+              }
+              break;
+            case "sudo":
+              if (args[0] === "apt") {
+                this.execute("apt " + args.slice(1).join(" "));
+              } else
+                this.print(
+                  `[sudo] password for ${State.user}: (auto-accepted)\nCommand not found or supported via sudo.`,
+                );
+              break;
+            case "apt":
+            case "apt-get":
+              if (args[0] === "update") {
+                this.print(
+                  "Hit:1 http://archive.ubuntu.com/ubuntu jammy InRelease\nReading package lists... Done",
+                );
+              } else if (args[0] === "install") {
+                if (!args[1]) {
+                  this.print("apt: missing package name");
+                  break;
+                }
+                this.print(
+                  `Reading package lists... Done\nBuilding dependency tree... Done\nThe following NEW packages will be installed:\n  ${args[1]}\n0 upgraded, 1 newly installed, 0 to remove.`,
+                );
+                setTimeout(() => {
+                  this.print(`Unpacking ${args[1]}...`);
+                }, 500);
+                setTimeout(() => {
+                  this.print(`Setting up ${args[1]}...`);
+                  if (!State.installedPackages.includes(args[1]))
+                    State.installedPackages.push(args[1]);
+                  if (args[1] === "cmatrix")
+                    Apps["cmatrix"] = {
+                      id: "cmatrix",
+                      name: "CMatrix",
+                      icon: "fas fa-barcode",
+                      color: "#0f0",
+                    };
+                  Shell.updateDock();
+                }, 1500);
+              } else {
+                this.print("apt: unsupported command");
+              }
+              break;
+            case "snap":
+              this.print(`snap: installing ${args[1] || ""}... Done.`);
+              break;
+            case "echo":
+              this.print(args.join(" "));
+              break;
+            case "help":
+              this.print(
+                "Available commands: ls, cd, pwd, cat, mkdir, touch, rm, clear, neofetch, python3 [code], sudo apt update/install, echo",
+              );
+              break;
+            default:
+              this.print(`${cmd}: command not found`);
+          }
+        }
+      }
+
+      class FilesApp {
+        constructor(container, winId, initialPath) {
+          this.container = container;
+          this.pwd = initialPath || "/home/" + State.user;
+          this.render();
+        }
+
+        render() {
+          this.container.innerHTML = `
+                    <div style="display:flex; padding: 5px 10px; background: var(--window-header); border-bottom: 1px solid var(--window-border); gap: 10px; align-items:center;">
+                        <button class="win-btn btn-min" style="background:#ddd" onclick="WM.renderAppContent('files', '${this.container.id.replace("content-", "")}', '/home/${State.user}')"><i class="fas fa-home text-black"></i></button>
+                        <input type="text" value="${this.pwd}" disabled style="flex:1; background: rgba(0,0,0,0.05); border:none; padding: 3px 10px; border-radius:3px;">
+                    </div>
+                    <div style="display:flex; flex:1; overflow:hidden;">
+                        <div class="files-sidebar">
+                            <div class="files-nav-item" onclick="WM.renderAppContent('files', '${this.container.id.replace("content-", "")}', '/home/${State.user}')"><i class="fas fa-home"></i> Home</div>
+                            <div class="files-nav-item" onclick="WM.renderAppContent('files', '${this.container.id.replace("content-", "")}', '/home/${State.user}/Documents')"><i class="fas fa-file-alt"></i> Documents</div>
+                            <div class="files-nav-item" onclick="WM.renderAppContent('files', '${this.container.id.replace("content-", "")}', '/home/${State.user}/Downloads')"><i class="fas fa-download"></i> Downloads</div>
+                            <div class="files-nav-item" onclick="WM.renderAppContent('files', '${this.container.id.replace("content-", "")}', '/')"><i class="fas fa-hdd"></i> Computer</div>
+                        </div>
+                        <div class="files-main" id="files-grid-${this.container.id}"></div>
+                    </div>
+                `;
+          this.loadDir();
+        }
+
+        loadDir() {
+          const grid = getEl(`files-grid-${this.container.id}`);
+          const node = getVFSNode(this.pwd);
+          grid.innerHTML = "";
+
+          if (this.pwd !== "/") {
+            let upPath = this.pwd.substring(0, this.pwd.lastIndexOf("/")) || "/";
+            let div = document.createElement("div");
+            div.className = "file-item";
+            div.innerHTML = `<i class="fas fa-level-up-alt" style="color:#555"></i><span>..</span>`;
+            div.onclick = () => {
+              this.pwd = upPath;
+              this.render();
+            };
+            grid.appendChild(div);
+          }
+
+          if (node && typeof node === "object") {
+            for (let key in node) {
+              let isDir = typeof node[key] === "object";
+              let div = document.createElement("div");
+              div.className = "file-item";
+              let icon = isDir ? "fa-folder" : "fa-file-lines";
+              div.innerHTML = `<i class="fas ${icon}"></i><span>${key}</span>`;
+              div.onclick = () => {
+                if (isDir) {
+                  this.pwd = this.pwd === "/" ? "/" + key : this.pwd + "/" + key;
+                  this.render();
+                } else {
+                  WM.open("editor", { path: this.pwd === "/" ? "/" + key : this.pwd + "/" + key });
+                }
+              };
+              grid.appendChild(div);
+            }
+          }
+        }
+      }
+
+      class EditorApp {
+        constructor(container, winId, args) {
+          this.container = container;
+          this.filePath = args?.path || null;
+          this.content = "";
+          if (this.filePath) {
+            let node = getVFSNode(this.filePath);
+            if (typeof node === "string") this.content = node;
+          }
+          this.render();
+        }
+
+        render() {
+          let filename = this.filePath ? this.filePath.split("/").pop() : "Untitled Document";
+          // Update title
+          this.container.parentElement.querySelector(".titlebar-title").innerText =
+            "Text Editor - " + filename;
+
+          this.container.innerHTML = `
+                    <div style="background: var(--window-header); padding: 5px; border-bottom: 1px solid var(--window-border); display:flex; gap: 5px;">
+                        <button class="toggle-btn" style="padding: 2px 10px;" id="save-${this.container.id}">Save</button>
+                    </div>
+                    <textarea class="editor-textarea" id="textarea-${this.container.id}">${this.content}</textarea>
+                `;
+
+          getEl(`save-${this.container.id}`).onclick = () => {
+            let text = getEl(`textarea-${this.container.id}`).value;
+            if (!this.filePath) {
+              this.filePath = "/home/" + State.user + "/Documents/untitled_" + Date.now() + ".txt";
+            }
+            let pPath = this.filePath.substring(0, this.filePath.lastIndexOf("/"));
+            let fName = this.filePath.substring(this.filePath.lastIndexOf("/") + 1);
+            let pNode = getVFSNode(pPath);
+            if (pNode) {
+              pNode[fName] = text;
+              this.container.parentElement.querySelector(".titlebar-title").innerText =
+                "Text Editor - " + fName;
+              let btn = getEl(`save-${this.container.id}`);
+              btn.innerText = "Saved!";
+              setTimeout(() => (btn.innerText = "Save"), 1000);
+            }
+          };
+        }
+      }
+
+      class SettingsApp {
+        constructor(container, winId) {
+          this.container = container;
+          this.render();
+        }
+        render() {
+          this.container.innerHTML = `
+                    <div style="display:flex; height:100%;">
+                        <div class="settings-sidebar">
+                            <div class="files-nav-item active"><i class="fas fa-desktop"></i> Appearance</div>
+                            <div class="files-nav-item"><i class="fas fa-wifi"></i> Network</div>
+                            <div class="files-nav-item"><i class="fas fa-user"></i> Users</div>
+                            <div class="files-nav-item"><i class="fas fa-info-circle"></i> About</div>
+                        </div>
+                        <div class="settings-content">
+                            <h2>Appearance</h2>
+                            
+                            <div class="setting-group mt-6">
+                                <h3>Window Colors</h3>
+                                <div class="flex gap-4">
+                                    <button class="toggle-btn ${State.theme === "light" ? "active" : ""}" onclick="Shell.setTheme('light'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')">Light</button>
+                                    <button class="toggle-btn ${State.theme === "dark" ? "active" : ""}" onclick="Shell.setTheme('dark'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')">Dark</button>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <h3>Accent Color</h3>
+                                <div class="color-picker">
+                                    <div class="color-swatch ${State.accent === "#E95420" ? "active" : ""}" style="background:#E95420" onclick="Shell.setAccent('#E95420'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')"></div>
+                                    <div class="color-swatch ${State.accent === "#729FCF" ? "active" : ""}" style="background:#729FCF" onclick="Shell.setAccent('#729FCF'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')"></div>
+                                    <div class="color-swatch ${State.accent === "#8AE234" ? "active" : ""}" style="background:#8AE234" onclick="Shell.setAccent('#8AE234'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')"></div>
+                                    <div class="color-swatch ${State.accent === "#AD7FA8" ? "active" : ""}" style="background:#AD7FA8" onclick="Shell.setAccent('#AD7FA8'); WM.renderAppContent('settings', '${this.container.id.replace("content-", "")}')"></div>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <h3>Wallpaper</h3>
+                                <select class="toggle-btn w-full" onchange="Shell.setWallpaper(this.value)">
+                                    <option value="https://images.unsplash.com/photo-1618367588411-d9a90fefa881?q=80&w=2000&auto=format&fit=crop" ${State.wallpaper.includes("1618367") ? "selected" : ""}>Ubuntu Default Style</option>
+                                    <option value="https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0?q=80&w=2000&auto=format&fit=crop" ${State.wallpaper.includes("1478760") ? "selected" : ""}>Dark Texture</option>
+                                    <option value="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2000&auto=format&fit=crop" ${State.wallpaper.includes("1550684") ? "selected" : ""}>Abstract Colors</option>
+                                </select>
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+        }
+      }
+
+      class SoftwareApp {
+        constructor(container, winId) {
+          this.container = container;
+          this.catalog = [
+            {
+              id: "vscode",
+              name: "Code Editor",
+              desc: "Code editing. Redefined.",
+              icon: "fas fa-code",
+              color: "#007ACC",
+            },
+            {
+              id: "gimp",
+              name: "GIMP",
+              desc: "GNU Image Manipulation Program",
+              icon: "fas fa-paint-brush",
+              color: "#5C5543",
+            },
+            {
+              id: "vlc",
+              name: "VLC",
+              desc: "Media player",
+              icon: "fas fa-play-circle",
+              color: "#FF8800",
+            },
+            {
+              id: "firefox",
+              name: "Firefox",
+              desc: "Web Browser",
+              icon: "fab fa-firefox-browser",
+              color: "#FF7139",
+            },
+          ];
+          this.render();
+        }
+
+        render() {
+          let html = '<div class="software-grid">';
+          this.catalog.forEach((item) => {
+            let isInstalled = State.installedPackages.includes(item.id);
+            html += `
+                        <div class="software-card">
+                            <div class="software-icon" style="color: ${item.color}"><i class="${item.icon}"></i></div>
+                            <div class="software-info">
+                                <div class="font-bold">${item.name}</div>
+                                <div class="text-xs opacity-70 mb-2">${item.desc}</div>
+                                <button class="software-btn ${isInstalled ? "installed" : ""}" id="btn-inst-${item.id}" onclick="SoftwareApp.install('${item.id}', '${this.container.id}')">
+                                    ${isInstalled ? "Installed" : "Install"}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+          });
+          html += "</div>";
+          this.container.innerHTML = html;
+        }
+
+        static install(id, containerId) {
+          if (State.installedPackages.includes(id)) return;
+          let btn = getEl(`btn-inst-${id}`);
+          btn.innerText = "Installing...";
+          setTimeout(() => {
+            State.installedPackages.push(id);
+            btn.innerText = "Installed";
+            btn.classList.add("installed");
+            // Add fake app to catalog to be visible in Activities
+            Apps[id] = { id: id, name: id.toUpperCase(), icon: "fas fa-box", color: "#888" };
+          }, 2000);
+        }
+      }
+
+      class MonitorApp {
+        constructor(container, winId) {
+          this.container = container;
+          this.interval = null;
+          this.render();
+          this.start();
+        }
+        render() {
+          this.container.innerHTML = `
+                    <div style="padding: 20px;">
+                        <h3 class="font-bold mb-2">CPU History</h3>
+                        <div class="monitor-graph">
+                            <svg width="100%" height="100%" preserveAspectRatio="none" id="cpu-svg-${this.container.id}">
+                                <polyline class="graph-line" id="cpu-poly-${this.container.id}" points="0,150"></polyline>
+                            </svg>
+                            <div style="position:absolute; top:5px; left:5px; font-size:12px; font-weight:bold" id="cpu-text-${this.container.id}">0%</div>
+                        </div>
+                        <h3 class="font-bold mb-2">Memory and Swap History</h3>
+                        <div class="monitor-graph">
+                            <svg width="100%" height="100%" preserveAspectRatio="none">
+                                <polyline class="graph-line" style="stroke:#729FCF; fill:rgba(114,159,207,0.2)" id="mem-poly-${this.container.id}" points="0,150"></polyline>
+                            </svg>
+                            <div style="position:absolute; top:5px; left:5px; font-size:12px; font-weight:bold" id="mem-text-${this.container.id}">2.1 GiB (25%)</div>
+                        </div>
+                    </div>
+                `;
+        }
+        start() {
+          let cpuPoints = Array(50).fill(150);
+          let memPoints = Array(50).fill(100); // stable baseline
+          this.interval = setInterval(() => {
+            if (!getEl(`cpu-poly-${this.container.id}`)) {
+              clearInterval(this.interval);
+              return;
+            }
+
+            // CPU random walk
+            let cpuVal = Math.floor(Math.random() * 60) + 10;
+            cpuPoints.shift();
+            cpuPoints.push(150 - (cpuVal / 100) * 150);
+
+            let ptsStr = cpuPoints.map((p, i) => `${i * (1000 / 50)},${p}`).join(" ");
+            ptsStr += ` 1000,150 0,150`; // Close shape
+            getEl(`cpu-poly-${this.container.id}`).setAttribute("points", ptsStr);
+            getEl(`cpu-text-${this.container.id}`).innerText = cpuVal + "%";
+
+            // Mem random walk (slower)
+            let memChange = (Math.random() - 0.5) * 5;
+            let lastMem = memPoints[49];
+            let newMem = Math.max(50, Math.min(130, lastMem + memChange));
+            memPoints.shift();
+            memPoints.push(newMem);
+
+            let mPtsStr = memPoints.map((p, i) => `${i * (1000 / 50)},${p}`).join(" ");
+            mPtsStr += ` 1000,150 0,150`;
+            getEl(`mem-poly-${this.container.id}`).setAttribute("points", mPtsStr);
+            let memPct = Math.floor(((150 - newMem) / 150) * 100);
+            getEl(`mem-text-${this.container.id}`).innerText =
+              `${(memPct * 0.08).toFixed(1)} GiB (${memPct}%)`;
+          }, 1000);
+        }
+      }
+
+      // --- Desktop Shell ---
+      const Shell = {
+        init() {
+          this.updateClock();
+          setInterval(() => this.updateClock(), 10000);
+          this.updateDock();
+
+          // Konami code setup
+          this.konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+          this.kpos = 0;
+
+          document.addEventListener("keydown", (e) => this.handleGlobalKeys(e));
+        },
+
+        updateClock() {
+          const now = new Date();
+          const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+          const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+          getEl("clock").innerText = `${days[now.getDay()]} ${time}`;
+        },
+
+        updateDock() {
+          const dock = getEl("dock");
+          dock.innerHTML = `
+                    <div class="dock-icon" title="Activities" onclick="Shell.toggleActivities()">
+                        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='white' stroke-width='8'/><circle cx='50' cy='20' r='8' fill='white'/><circle cx='20' cy='70' r='8' fill='white'/><circle cx='80' cy='70' r='8' fill='white'/></svg>" width="24" height="24">
+                    </div>
+                `;
+
+          // Distinct pinned apps
+          DockApps.forEach((appId) => {
+            const app = Apps[appId];
+            const isRunning = State.windows.some((w) => w.appId === appId);
+            const isActive = State.windows.some(
+              (w) => w.appId === appId && w.id === State.activeWindowId,
+            );
+
+            dock.innerHTML += `
+                        <div class="dock-icon ${isRunning ? "running" : ""} ${isActive ? "active" : ""}" style="background: ${app.color}" onclick="Shell.launchOrFocus('${appId}')" title="${app.name}">
+                            <i class="${app.icon}"></i>
+                        </div>
+                    `;
+          });
+        },
+
+        launchOrFocus(appId) {
+          const existing = State.windows.find((w) => w.appId === appId);
+          if (existing) {
+            if (existing.minimized || State.activeWindowId !== existing.id) {
+              WM.focus(existing.id);
+            } else {
+              WM.minimize(existing.id);
+            }
+          } else {
+            WM.open(appId);
+          }
+          this.hideActivities();
+        },
+
+        toggleActivities() {
+          const act = getEl("activities-overview");
+          if (act.style.display === "flex") {
+            this.hideActivities();
+          } else {
+            act.style.display = "flex";
+            setTimeout(() => (act.style.opacity = "1"), 10);
+            this.populateActivities();
+          }
+        },
+
+        hideActivities() {
+          const act = getEl("activities-overview");
+          act.style.opacity = "0";
+          setTimeout(() => (act.style.display = "none"), 300);
+        },
+
+        populateActivities() {
+          const grid = getEl("app-launcher-grid");
+          grid.innerHTML = "";
+          Object.values(Apps).forEach((app) => {
+            grid.innerHTML += `
+                        <div class="app-shortcut" onclick="Shell.launchOrFocus('${app.id}')">
+                            <i class="${app.icon}" style="color: ${app.color}"></i>
+                            <span>${app.name}</span>
+                        </div>
+                    `;
+          });
+        },
+
+        setTheme(mode) {
+          State.theme = mode;
+          if (mode === "dark") document.documentElement.classList.add("dark-mode");
+          else document.documentElement.classList.remove("dark-mode");
+        },
+
+        setAccent(color) {
+          State.accent = color;
+          document.documentElement.style.setProperty("--accent-color", color);
+        },
+
+        setWallpaper(url) {
+          State.wallpaper = url;
+          document.documentElement.style.setProperty("--wallpaper", `url('${url}')`);
+        },
+
+        lockScreen() {
+          getEl("desktop").style.opacity = "0";
+          setTimeout(() => {
+            getEl("desktop").style.display = "none";
+            getEl("login-screen").style.display = "flex";
+            setTimeout(() => {
+              getEl("login-screen").style.opacity = "1";
+              getEl("login-pwd").value = "";
+              getEl("login-pwd").focus();
+            }, 50);
+          }, 500);
+        },
+
+        handleGlobalKeys(e) {
+          // Konami
+          if (e.keyCode === this.konami[this.kpos]) {
+            this.kpos++;
+            if (this.kpos === this.konami.length) {
+              this.kpos = 0;
+              this.triggerEasterEgg();
+            }
+          } else {
+            this.kpos = 0;
+          }
+
+          // Super Key -> Activities
+          if (e.key === "Meta") {
+            this.toggleActivities();
+          }
+
+          // Alt+Tab
+          if (e.altKey && e.key === "Tab") {
+            e.preventDefault();
+            this.showAltTab();
+          }
+          if (!e.altKey && getEl("alt-tab-overlay").style.display === "flex") {
+            this.executeAltTab();
+          }
+        },
+
+        showAltTab() {
+          if (State.windows.length === 0) return;
+          const overlay = getEl("alt-tab-overlay");
+          overlay.style.display = "flex";
+          overlay.innerHTML = "";
+
+          // Simple cycle logic
+          if (typeof this.altTabIndex === "undefined") this.altTabIndex = 0;
+          this.altTabIndex = (this.altTabIndex + 1) % State.windows.length;
+
+          State.windows.forEach((w, i) => {
+            const app = Apps[w.appId];
+            overlay.innerHTML += `
+                        <div class="alt-tab-item ${i === this.altTabIndex ? "selected" : ""}">
+                            <i class="${app.icon}" style="font-size: 40px; color: ${app.color}; margin-bottom:10px"></i>
+                            <span>${app.name}</span>
+                        </div>
+                    `;
+          });
+        },
+
+        executeAltTab() {
+          getEl("alt-tab-overlay").style.display = "none";
+          if (State.windows.length > 0 && typeof this.altTabIndex !== "undefined") {
+            WM.focus(State.windows[this.altTabIndex].id);
+          }
+          this.altTabIndex = undefined;
+        },
+
+        triggerEasterEgg() {
+          document.body.style.filter = "invert(1) hue-rotate(180deg)";
+          setTimeout(() => (document.body.style.filter = "none"), 3000);
+          WM.open("terminal");
+          setTimeout(() => {
+            const termIn = document.querySelector(".window.focused .term-input");
+            if (termIn) {
+              termIn.value = "echo 'Easter Egg Activated! All systems normal.'";
+              termIn.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter" }));
+            }
+          }, 500);
+        },
+      };
+
+      // --- Boot & Auth Flow ---
+      async function runBootSequence() {
+        const boot = getEl("boot-screen");
+        const logs = [
+          "Loading Linux 5.15.0-generic...",
+          "Loading initial ramdisk...",
+          "[ OK ] Reached target Local File Systems.",
+          "[ OK ] Started Dispatch Password Requests to Console Directory Watch.",
+          "[ OK ] Reached target Paths.",
+          "[ OK ] Reached target Basic System.",
+          "Mounting Kernel Debug File System...",
+          "[ OK ] Started System Logging Service.",
+          "[ OK ] Started Login Service.",
+          "[ OK ] Started User Manager for UID 1000.",
+          "Starting GNOME Display Manager...",
+          "[ OK ] Started GNOME Display Manager.",
+          "Reached target Graphical Interface.",
+        ];
+
+        for (let log of logs) {
+          let p = document.createElement("div");
+          p.className = "log-line";
+          if (log.includes("[ OK ]")) {
+            p.innerHTML = log.replace("[ OK ]", '<span class="log-ok">[  OK  ]</span>');
+          } else {
+            p.innerText = log;
+          }
+          boot.appendChild(p);
+          boot.scrollTop = boot.scrollHeight;
+          await sleep(Math.random() * 200 + 50);
+        }
+
+        await sleep(500);
+        boot.style.opacity = "0";
+
+        const login = getEl("login-screen");
+        login.style.display = "flex";
+        setTimeout(() => {
+          boot.remove();
+          login.style.opacity = "1";
+          getEl("login-pwd").focus();
+        }, 1000);
+      }
+
+      getEl("login-pwd").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const login = getEl("login-screen");
+          login.style.transform = "scale(1.1)";
+          login.style.opacity = "0";
+
+          setTimeout(() => {
+            login.style.display = "none";
+            const desktop = getEl("desktop");
+            desktop.style.display = "block";
+            setTimeout(() => (desktop.style.opacity = "1"), 50);
+
+            Shell.init();
+            // Open default welcome window
+            setTimeout(() => WM.open("terminal"), 500);
+          }, 800);
+        }
       });
 
-      animate();
+      // Start Boot
+      window.onload = () => runBootSequence();
     </script>
   </body>
 </html>
