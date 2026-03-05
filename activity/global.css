@@ -1,0 +1,77 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+
+* {
+  box-sizing: border-box;
+  padding: 0px;
+  margin: 0px;
+}
+
+a {
+  text-decoration: none;
+  color: rgb(233, 233, 233);
+}
+
+body {
+  font-family: "Open Sans", sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.navbar {
+  background-color: rgb(40, 40, 40);
+  color: rgb(233, 233, 233);
+  height: 100dvh;
+  width: 250px;
+  padding: 15px;
+}
+
+.navbar__links {
+  margin-top: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  list-style: none;
+}
+
+.navbar__link_item {
+  padding: 10px;
+  border-bottom: solid 1px rgba(255, 255, 255, 0.315);
+  cursor: pointer;
+}
+
+.navbar__link_item:hover {
+  background-color: rgb(56, 103, 213);
+  border-color: rgb(56, 103, 213);
+  color: rgb(233, 233, 233);
+}
+
+.active {
+  color: rgb(56, 103, 213);
+}
+
+.content {
+  width: 100%;
+}
+
+.content__header {
+  background-color: rgb(56, 103, 213);
+  color: rgb(233, 233, 233);
+  width: 100%;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main {
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.main__header p {
+  font-weight: bold;
+}

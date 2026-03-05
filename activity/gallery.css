@@ -1,0 +1,17 @@
+.gallery__list {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.gallery__item {
+  background-color: grey;
+  color: rgb(233, 233, 233);
+  padding: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}

@@ -1,0 +1,43 @@
+.profile {
+  width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.profile hr {
+  width: 50%;
+}
+
+.profile__avatar {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+}
+
+.profile__name,
+.profile__about {
+  text-align: center;
+}
+
+.profile__about {
+  margin-top: 20px;
+  text-wrap: break-word;
+  width: 50%;
+}
+
+.details {
+  width: 100%;
+  padding-left: 25px;
+  margin-top: 35px;
+  display: flex;
+  gap: 10px;
+}
+
+.details__item {
+  width: 30%;
+}
